@@ -3,7 +3,7 @@ import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 from database import init_db
-from routes import bp as produtos_bp
+from produtos.routes import bp as produtos_bp
 from swagger import bp as docs_bp
 
 app = Flask(__name__)

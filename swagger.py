@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template_string
-from routes import DIAS_ALERTA
+from config import DIAS_ALERTA
 
 bp = Blueprint("docs", __name__)
 
