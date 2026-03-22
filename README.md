@@ -1,0 +1,97 @@
+# FreshElf API
+
+API REST para controle de validade de produtos perecíveis. Permite cadastrar, listar e remover produtos, com alerta automático para itens próximos do vencimento.
+
+---
+
+## Tecnologias
+
+- Python 3 + Flask
+- SQLite (banco de dados local, sem instalação adicional)
+- Flask-CORS (permite acesso da SPA)
+
+---
+
+## Instalação
+
+### 1. Clone o repositório
+
+```bash
+git clone <url-do-repositorio>
+cd freshelf-api
+```
+
+### 2. Crie e ative o ambiente virtual
+
+```bash
+python3 -m venv venv
+source venv/bin/activate      # macOS / Linux
+venv\Scripts\activate         # Windows
+```
+
+### 3. Instale as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Inicialização
+
+```bash
+python app.py
+```
+
+A API estará disponível em `http://localhost:5001`.
+
+O banco de dados `produtos.db` é criado automaticamente na primeira execução.
+
+---
+
+## Documentação interativa (Swagger)
+
+Com a API em execução, acesse:
+
+```
+http://localhost:5001/docs
+```
+
+O spec OpenAPI 3.0 em JSON está disponível em:
+
+```
+http://localhost:5001/openapi.json
+```
+
+---
+
+## Rotas disponíveis
+
+| Método | Rota                     | Descrição                                            |
+|--------|--------------------------|------------------------------------------------------|
+| POST   | `/produtos`              | Cadastra um novo produto                             |
+| GET    | `/produtos`              | Lista todos os produtos (ordenados por validade)     |
+| GET    | `/produtos/vencendo`     | Lista produtos vencidos ou com vencimento em ≤ 7 dias|
+| GET    | `/produtos/estatisticas` | Retorna contagem de produtos por status de validade  |
+| DELETE | `/produtos/<id>`         | Remove um produto pelo ID                            |
+
+### Exemplo de corpo para `POST /produtos`
+
+```json
+{
+  "nome": "Leite Integral",
+  "categoria": "Laticínios",
+  "quantidade": 6,
+  "data_validade": "2026-04-15",
+  "local_armazenamento": "Geladeira"
+}
+```
+
+### Códigos de status
+
+| Código | Situação                        |
+|--------|---------------------------------|
+| 200    | Operação realizada com sucesso  |
+| 201    | Produto cadastrado com sucesso  |
+| 400    | Dados inválidos ou ausentes     |
+| 404    | Produto não encontrado          |
