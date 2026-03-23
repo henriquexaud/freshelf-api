@@ -3,40 +3,22 @@ from config import DIAS_ALERTA
 from repository import product_repository
 
 
-def _calcular_status(data_validade_str):
-    hoje = date.today()
-    validade = date.fromisoformat(data_validade_str)
-    diff = (validade - hoje).days
-    if diff < 0:
-        return "vencido"
-    if diff == 0:
-        return "vence_hoje"
-    if diff <= DIAS_ALERTA:
-        return "vencendo"
-    return "ok"
-
-
-def _enriquecer(produto):
-    produto["status"] = _calcular_status(produto["data_validade"])
-    return produto
-
-
 def cadastrar(dados):
-    return product_repository.inserir(dados["nome"], dados["quantidade"], dados["data_validade"])
+    return product_repository.inserir(dados)
 
 
 def listar_todos():
-    return [_enriquecer(p) for p in product_repository.buscar_todos()]
+    return [produto.to_dict(dias_alerta=DIAS_ALERTA) for produto in product_repository.buscar_todos()]
 
 
 def listar_vencendo():
-    limite = (date.today() + timedelta(days=DIAS_ALERTA)).isoformat()
-    return [_enriquecer(p) for p in product_repository.buscar_por_validade_ate(limite)]
+    limite = date.today() + timedelta(days=DIAS_ALERTA)
+    return [produto.to_dict(dias_alerta=DIAS_ALERTA) for produto in product_repository.buscar_por_validade_ate(limite)]
 
 
 def obter_estatisticas():
-    hoje = date.today().isoformat()
-    limite = (date.today() + timedelta(days=DIAS_ALERTA)).isoformat()
+    hoje = date.today()
+    limite = date.today() + timedelta(days=DIAS_ALERTA)
     total, vencidos, vencendo = product_repository.contar_estatisticas(hoje, limite)
     ok = total - vencidos - vencendo
     return {"total": total, "ok": ok, "vencendo": vencendo, "vencidos": vencidos}

@@ -1,5 +1,6 @@
 from datetime import date
 from config import TAMANHO_MAX_NOME
+from models import ProductModel
 
 
 def validar_produto(dados):
@@ -33,8 +34,8 @@ def validar_produto(dados):
     except ValueError:
         return None, "Data de validade inválida (use AAAA-MM-DD)"
 
-    return {
-        "nome": nome,
-        "quantidade": quantidade,
-        "data_validade": data_validade.isoformat(),
-    }, None
+    return ProductModel(
+        nome=nome,
+        quantidade=quantidade,
+        data_validade=data_validade,
+    ), None
