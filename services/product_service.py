@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from config import DIAS_ALERTA
-from produtos import repository
+from repository import product_repository
 
 
 def _calcular_status(data_validade_str):
@@ -22,25 +22,25 @@ def _enriquecer(produto):
 
 
 def cadastrar(dados):
-    return repository.inserir(dados["nome"], dados["quantidade"], dados["data_validade"])
+    return product_repository.inserir(dados["nome"], dados["quantidade"], dados["data_validade"])
 
 
 def listar_todos():
-    return [_enriquecer(p) for p in repository.buscar_todos()]
+    return [_enriquecer(p) for p in product_repository.buscar_todos()]
 
 
 def listar_vencendo():
     limite = (date.today() + timedelta(days=DIAS_ALERTA)).isoformat()
-    return [_enriquecer(p) for p in repository.buscar_por_validade_ate(limite)]
+    return [_enriquecer(p) for p in product_repository.buscar_por_validade_ate(limite)]
 
 
 def obter_estatisticas():
     hoje = date.today().isoformat()
     limite = (date.today() + timedelta(days=DIAS_ALERTA)).isoformat()
-    total, vencidos, vencendo = repository.contar_estatisticas(hoje, limite)
+    total, vencidos, vencendo = product_repository.contar_estatisticas(hoje, limite)
     ok = total - vencidos - vencendo
     return {"total": total, "ok": ok, "vencendo": vencendo, "vencidos": vencidos}
 
 
 def remover(produto_id):
-    return repository.deletar(produto_id)
+    return product_repository.deletar(produto_id)
