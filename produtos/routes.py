@@ -1,16 +1,17 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from produtos import service
-from produtos.validators import validar_payload_produto
+from produtos.validators import validar_produto
 
 bp = Blueprint("produtos", __name__)
 
 
 @bp.route("/produtos", methods=["POST"])
 def cadastrar_produto():
-    dados, erro = validar_payload_produto()
+    dados = request.get_json(silent=True)
+    produto, erro = validar_produto(dados)
     if erro:
-        return erro
-    produto_id = service.cadastrar(dados)
+        return jsonify({"erro": erro}), 400
+    produto_id = service.cadastrar(produto)
     return jsonify({"id": produto_id, "mensagem": "Produto cadastrado com sucesso"}), 201
 
 

@@ -127,6 +127,11 @@ SPEC = {
                     "nome": {"type": "string"},
                     "quantidade": {"type": "integer"},
                     "data_validade": {"type": "string", "format": "date"},
+                    "status": {
+                        "type": "string",
+                        "enum": ["ok", "vencendo", "vence_hoje", "vencido"],
+                        "description": "Status calculado com base na data de validade",
+                    },
                 },
             },
             "ProdutoInput": {

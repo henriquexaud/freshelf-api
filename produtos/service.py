@@ -1,53 +1,46 @@
-from contextlib import closing
 from datetime import date, timedelta
-from database import get_db
 from config import DIAS_ALERTA
+from produtos import repository
+
+
+def _calcular_status(data_validade_str):
+    hoje = date.today()
+    validade = date.fromisoformat(data_validade_str)
+    diff = (validade - hoje).days
+    if diff < 0:
+        return "vencido"
+    if diff == 0:
+        return "vence_hoje"
+    if diff <= DIAS_ALERTA:
+        return "vencendo"
+    return "ok"
+
+
+def _enriquecer(produto):
+    produto["status"] = _calcular_status(produto["data_validade"])
+    return produto
 
 
 def cadastrar(dados):
-    with closing(get_db()) as conn:
-        cursor = conn.execute(
-            "INSERT INTO produtos (nome, quantidade, data_validade) VALUES (?, ?, ?)",
-            (dados["nome"], dados["quantidade"], dados["data_validade"]),
-        )
-        conn.commit()
-        return cursor.lastrowid
+    return repository.inserir(dados["nome"], dados["quantidade"], dados["data_validade"])
 
 
 def listar_todos():
-    with closing(get_db()) as conn:
-        rows = conn.execute("SELECT * FROM produtos ORDER BY data_validade ASC").fetchall()
-    return [dict(r) for r in rows]
+    return [_enriquecer(p) for p in repository.buscar_todos()]
 
 
 def listar_vencendo():
-    limite = date.today() + timedelta(days=DIAS_ALERTA)
-    with closing(get_db()) as conn:
-        rows = conn.execute(
-            "SELECT * FROM produtos WHERE data_validade <= ? ORDER BY data_validade ASC",
-            (limite.isoformat(),),
-        ).fetchall()
-    return [dict(r) for r in rows]
+    limite = (date.today() + timedelta(days=DIAS_ALERTA)).isoformat()
+    return [_enriquecer(p) for p in repository.buscar_por_validade_ate(limite)]
 
 
 def obter_estatisticas():
     hoje = date.today().isoformat()
     limite = (date.today() + timedelta(days=DIAS_ALERTA)).isoformat()
-    with closing(get_db()) as conn:
-        total = conn.execute("SELECT COUNT(*) FROM produtos").fetchone()[0]
-        vencidos = conn.execute(
-            "SELECT COUNT(*) FROM produtos WHERE data_validade < ?", (hoje,)
-        ).fetchone()[0]
-        vencendo = conn.execute(
-            "SELECT COUNT(*) FROM produtos WHERE data_validade >= ? AND data_validade <= ?",
-            (hoje, limite),
-        ).fetchone()[0]
+    total, vencidos, vencendo = repository.contar_estatisticas(hoje, limite)
     ok = total - vencidos - vencendo
     return {"total": total, "ok": ok, "vencendo": vencendo, "vencidos": vencidos}
 
 
 def remover(produto_id):
-    with closing(get_db()) as conn:
-        cursor = conn.execute("DELETE FROM produtos WHERE id = ?", (produto_id,))
-        conn.commit()
-        return cursor.rowcount
+    return repository.deletar(produto_id)
