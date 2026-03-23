@@ -43,6 +43,20 @@ pip install -r requirements.txt
 python app.py
 ```
 
+## Estrutura
+
+```text
+app.py
+config/
+controllers/
+docs/
+infrastructure/
+repository/
+routes/
+services/
+validators/
+```
+
 A API estará disponível em `http://localhost:5001`.
 
 Por padrão, a aplicação sobe apenas em ambiente local com debug desligado. Para ativar debug localmente:

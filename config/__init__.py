@@ -1,0 +1,1 @@
+from .settings import DIAS_ALERTA, TAMANHO_MAX_NOME

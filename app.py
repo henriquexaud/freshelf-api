@@ -2,9 +2,9 @@ import os
 
 from flask import Flask, jsonify
 from flask_cors import CORS
-from database import init_db
+from infrastructure import init_db
 from routes.product_routes import bp as produtos_bp
-from swagger import bp as docs_bp
+from docs import bp as docs_bp
 
 app = Flask(__name__)
 CORS(app)

@@ -1,8 +1,8 @@
-import sqlite3
 import os
+import sqlite3
 from contextlib import closing
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "produtos.db")
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "produtos.db")
 
 COLUNAS_PRODUTOS = ["id", "nome", "quantidade", "data_validade"]
 

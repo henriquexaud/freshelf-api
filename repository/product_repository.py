@@ -1,5 +1,5 @@
 from contextlib import closing
-from database import get_db
+from infrastructure import get_db
 
 
 def inserir(nome, quantidade, data_validade):
